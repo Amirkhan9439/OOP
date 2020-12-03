@@ -1,0 +1,65 @@
+<html>
+<head>
+<style>
+a:link{
+text-decoration:none;
+}
+a:hover{
+text-decoration:underline;
+}
+
+#header {
+font-weight:bold;
+background: #cccccc;
+}
+a:active{
+font-weight: bold;
+color:blue;
+text-decoration:underline;
+}
+table {
+width: 100%;
+border: 2px solid black;
+border-collapse: collapse;
+}
+td {
+padding-top: 5px;
+padding-bottom: 5px;
+border: 2px solid black;
+text-align: center;
+}
+</style>
+<script src="contents.js"></script>
+</head>
+<body>
+<p></p>
+<table>
+<tr id="header">
+<td>Lecture No</td>
+<td>Date</td>
+<td>Day</td>
+<td>Topic</td>
+<td>Recording Link</td>
+</tr>
+</table>
+<script>
+for(var e = 0; e < arr.length; e++) {
+var tr = document.createElement("tr");
+for(var i = 0; i < 5; i++) {
+var td = document.createElement("td");
+if(i == 4) {
+var an = document.createElement("a");
+an.href = arr[e][i];
+an.target="_blank";
+an.innerHTML = "Go";
+td.appendChild(an);
+}else {
+td.innerHTML = arr[e][i];
+}
+tr.appendChild(td);
+}
+document.getElementsByTagName("table")[0].appendChild(tr);
+}
+</script>
+</body>
+</html>
