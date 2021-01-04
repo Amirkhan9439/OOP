@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.label {
+	font-size: 30px;
+	font-weight: bold;
+}
+input {
+	font-size: 30px;
+	border:2px solid black;
+}
+button {
+font-size:30px;
+}
+p {
+font-size:30px;
+}
+</style>
+</head>
+<body>
+<h1>Aamir's Github Pages</h1>
+<span class="label">Real:</span> <input type="number"/><br/><br/>
+<span class="label">Imag:</span> <input type="number"/> <span class="label">j</span>
+<button onclick="a()">ToPolar</button>
+<p></p><br/><br/>
+<span class="label">Magnitude:</span> <input type="number"/><br/><br/>
+<span class="label">Angle: </span> <input type="number"/> <span class="label">&#176;</span>
+<button onclick="b()">ToRect</button>
+<p></p>
+<script>
+function a() {
+	toPolar(document.getElementsByTagName("input")[0].value, document.getElementsByTagName("input")[1].value);
+}
+function b() {
+	toRect(document.getElementsByTagName("input")[2].value, document.getElementsByTagName("input")[3].value);
+}
+function toPolar(real, imag) {
+var mag = Math.sqrt(real*real + imag * imag);
+var angle = 0;
+if(real < 0) {
+	angle = 180 - Math.atan(imag/((-1)*real)) * 180/Math.PI;
+}else {
+	angle = Math.atan(imag/real) * 180/Math.PI;
+}
+document.getElementsByTagName("p")[0].innerHTML = conv(mag) + " &#x2220; " + conv(angle) + "&#176;";
+}
+
+function toRect(mag, angle) {
+	var real = mag*Math.cos(angle * Math.PI/180), imag = mag*Math.sin(angle * Math.PI/180)
+	document.getElementsByTagName("p")[1].innerHTML = conv(real) + ((imag<0)?" - ":" + ") + ((imag<0)?(-1)*conv(imag):conv(imag)) + "j";
+}
+
+function conv(n) {
+	return Math.round(n*100)/100;
+}
+</script>
+</body>
+</html>
