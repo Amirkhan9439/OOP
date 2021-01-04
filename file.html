@@ -27,7 +27,8 @@ font-size:30px;
 <span class="label">Magnitude:</span> <input type="number"/><br/><br/>
 <span class="label">Angle: </span> <input type="number"/> <span class="label">&#176;</span>
 <button onclick="b()">ToRect</button>
-<p></p>
+<p></p><br/><br/></br>
+<button onclick="Reset()">Reset</button>
 <script>
 function a() {
 	toPolar(document.getElementsByTagName("input")[0].value, document.getElementsByTagName("input")[1].value);
@@ -53,6 +54,14 @@ function toRect(mag, angle) {
 
 function conv(n) {
 	return Math.round(n*100)/100;
+}
+function Reset() {
+document.getElementsByTagName("input")[0].value = "";
+document.getElementsByTagName("input")[1].value = "";
+document.getElementsByTagName("input")[2].value = "";
+document.getElementsByTagName("input")[3].value = "";
+document.getElementsByTagName("p")[0].innerHTML = "";
+document.getElementsByTagName("p")[1].innerHTML = "";
 }
 </script>
 </body>
