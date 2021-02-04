@@ -1,54 +1,126 @@
 <html>
-<head>
-</head>
 <body>
-<script>
-var body = document.getElementsByTagName("body")[0];
-var par = document.createElement("p");
-par.innerHTML = "These values are randomly generated for you. You should now copy and paste them into word document. That's it. Ab itna to kr hi lo";
-par.style.fontSize = "30px";
-par.style.color = "#ff0000";
-body.appendChild(par);
-genTable(1.4, 0.7, -10, 1);
-genTable(1.1, 0, 11, "2 (R2 = 100K)");
-genTable(1.1, 0, 2, "2 (R2 = 10K)");
-function genTable(mult, sub, gain, tnumber) {
-var body = document.getElementsByTagName("body")[0];
-var heading = document.createElement("h2");
-heading.innerHTML = "table " + tnumber;
-body.appendChild(heading);
-var table = document.createElement("table");
-for(var row = 0; row < 6; row++) {
-	var arr = ["Vin", "Vtheory", "Vexp", "error"];
-	var tr = document.createElement("tr");
-	tr.style.textAlign = "center";
-	if(row!=0) {
-	var vin = Math.random() * mult  - sub;
-	var vth= gain * vin;
-	var err = Math.random()/30;
-	err -= err/2;
-	var vexp = vth + err;
-	err = ((vth - vexp)/vth) * 100;
-	err *= (err<0)?(-1):1;
-	err = Math.round(err*100)/100;
-	err = err + "%";
-	arr =  [Math.round(vin*100)/100, Math.round(vth*100)/100, Math.round(vexp*100)/100, err];
-	} else {
-		tr.style.fontWeight = "bold";
+<label>Enter Last 4 digits of your Reg: </label><input maxlength="4" size="4"/>
+<Button onclick="Exec()">Calculate</Button>
+<p></p>
+<!--<p><span id="hole"><span id="num"  style="text-decoration:underline">amir is</span></br><span style="text-decoration:overline">Dnum</span></span></p>
+--><script>
+var degreeSign = '&#176;', angleSign = '&#x2220;';
+class Complex {
+	constructor(ar) {
+		if(ar[2] == 1) {
+			this.re = round(ar[0] * Math.cos(ar[1] * Math.PI/180));
+			this.im = round(ar[1] * Math.sin(ar[1] * Math.PI/180));
+		}else {
+			this.re = round(ar[0]);
+			this.im = round(ar[1]);
+		}
 	}
-	for(var col = 0; col < 4; col++) {
-		var td = document.createElement("td");
-		td.innerHTML = arr[col];
-		tr.appendChild(td);
+	getRect() {
+		return [this.re, this.im, 0];
 	}
-	table.appendChild(tr);
+	getPolar() {
+		var mag = Math.sqrt(this.re*this.re + this.im * this.im);
+		var angle = 0;
+		if(this.re < 0) {
+			angle = 180 - Math.atan(this.im/((-1)*this.re)) * 180/Math.PI;
+		}else {
+			angle = Math.atan(this.im/this.re) * 180/Math.PI;
+		}
+		return [round(mag), round(angle), 1];
+	}
+	getConjugate() {
+		return 8;
+	}
+	getPrintableRect() {
+		return (this.re + ((this.im < 0)?" - ":" + ") + (this.im<0?(this.im*-1):this.im) +  "j");
+	}
+	getPrintablePolar() {
+		return this.getPolar()[0] + angleSign + this.getPolar()[1] + degreeSign;
+	}
 }
-body.appendChild(table);
-table.border = 1;
-table.style.borderCollapse = "collapse";
-body.appendChild(document.createElement("br"));
-body.appendChild(document.createElement("hr"));
+function Exec() {
+	var reg = document.getElementsByTagName("input")[0].value;
+	var str = "";
+	var arr = FindAvg(reg);
+	if(arr[0] == -1) str = "Invalid reg";
+	else {
+	reg = arr[0];
+	var sum = arr[1], avg = sum / 4;
+	let z = new Complex([50, sum, 0]);
+	str += "My reg is " + reg + " and the sum is " + sum;
+	str += "<br>  Z = " + z.getPrintableRect() + "<br> Z = " + z.getPrintablePolar();
+	str += "<br> power factor is cos(" + z.getPolar()[1] + ") = " + Math.cos(z.getPolar()[1] * Math.PI /180);
+	str += " " + ((z.getPolar()[1]<0)?"leading":"lagging")  + "<br>";
+	str += "Zc = " + z.getRect()[0] + "<sup>2</sup> + "  + z.getRect()[1] + "<sup>2</sup>"  + " &div; " + z.getRect()[0] + "tan(cos<sup>-1</sup>(1)) - " + z.getRect()[1];
+	var zc = (z.getRect()[0] *z.getRect()[0] + z.getRect()[1] *z.getRect()[1])/(z.getRect()[1]);
+	str+= "<br> Zc = " + zc + "j <br> we should connect a zc = " + zc + "j in parallel";
+	}
+	document.getElementsByTagName("p")[0].innerHTML = str;
 }
+function getCapacitiveImp(cap, freq) {
+	return new Complex([0, 1/(freq*cap),0]);
+}
+function getInductiveImp(ind, freq) {
+	return new Complex([0, freq*ind, 0]);
+}
+function Add(c1, c2) {
+	return new Complex([c1.getRect()[0] + c2.getRect()[0], c1.getRect()[1] + c2.getRect()[1]], 0);
+}
+
+function Sub(c1, c2) {
+	return new Complex([c1.getRect()[0] - c2.getRect()[0], c1.getRect()[1] - c2.getRect()[1]], 0);
+}
+
+function multiply(c1, c2) {
+	return new Complex([c1.getPolar()[0] * c2.getPolar()[0], c1.getPolar()[1] + c2.getPolar()[1]], 1);
+}
+
+function divide(c1, c2) {
+	return new Complex([c1.getPolar()[0] / c2.getPolar()[0], c1.getPolar()[1] - c2.getPolar()[1]], 1);
+}
+
+function getDivisionForm(num, dnum) {
+	var numLen = getLen(num), dLen = getLen(dnum);
+	if(numLen > dLen) dnum = fixLen(dnum, numLen - dLen);
+	else if(dLen > numLen) num = fixLen(num, dLen - numLen);
+	return "<span id='hole'><span id='n'  style='border-bottom: 2px solid black'>" + num + "</span></br><span style='border-top: 2px solid black'>" +dnum +"</span></span>";
+}
+
+function fixLen(str, s) {
+	var ret = "";
+	
+	for(var i = 0; i < s; i++) {
+		if(((i < s/2) && ((i+1) >(s/2))) || (i == s/2)) ret += str;
+		ret += "<span style='color:white'>a</span>";
+	}
+	return ret;
+}
+function FindAvg(inp) {
+	if(inp.length!=4) return [-1, -1];
+	var numArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+	var reg = 0, sum = 0, mult = 1;
+	for(var i = 0; i < 4; i++) {
+		if(numArray.indexOf(inp.charAt(i)) < 0) return [-1, -1];
+		sum += numArray.indexOf(inp.charAt(i));
+		reg += (1000/mult) * numArray.indexOf(inp.charAt(i));
+		mult *= 10;
+	}
+	return [reg, sum];
+}
+function getLen(str) {
+	var len = 0;
+	for(var i = 0; i < str.length; i++, len++) {
+    	if(str.charAt(i) == '&' && str.charAt(i+1)=='#') {
+        	while(str.charAt(i) != ';') i++;
+        }
+    }
+    return len;
+}
+function round(num) {
+	return Math.round(num*100)/100;
+}
+
 </script>
 </body>
 </html>
