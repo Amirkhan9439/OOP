@@ -5,7 +5,6 @@
 <script>
 var body = document.getElementsByTagName("body")[0];
 var par = document.createElement("p");
-<<<<<<< HEAD
 par.innerHTML = "CLICK the button bellow";
 par.style.fontSize = "30px";
 par.style.color = "#ff0000";
@@ -16,20 +15,10 @@ body.appendChild(button);
 var div = document.createElement("div");
 body.appendChild(div);
 genTable(1.4, 0.7, -10, 1);
-=======
-par.innerHTML = "These values are randomly generated for you. You should now copy and paste them into word document. That's it. Ab itna to kr hi lo";
-par.style.fontSize = "30px";
-par.style.color = "#ff0000";
-body.appendChild(par);
-genTable(1.4, 0.7, -10, 1);
-genTable(1.1, 0, 11, "2 (R2 = 100K)");
-genTable(1.1, 0, 2, "2 (R2 = 10K)");
->>>>>>> f24e036955644db27a6cc92299a5401204987ab9
 function genTable(mult, sub, gain, tnumber) {
 var body = document.getElementsByTagName("body")[0];
 var heading = document.createElement("h2");
 heading.innerHTML = "table " + tnumber;
-<<<<<<< HEAD
 document.getElementsByTagName("div")[0].appendChild(heading);
 var table = document.createElement("table");
 for(var row = 0; row < 6; row++) {
@@ -42,45 +31,24 @@ for(var row = 0; row < 6; row++) {
 	var cfreq = freqArr[row-1];
 	var vth= vin/(2*Math.PI*cfreq);
 	var err = Math.random()/100;
-=======
-body.appendChild(heading);
-var table = document.createElement("table");
-for(var row = 0; row < 6; row++) {
-	var arr = ["Vin", "Vtheory", "Vexp", "error"];
-	var tr = document.createElement("tr");
-	tr.style.textAlign = "center";
-	if(row!=0) {
-	var vin = Math.random() * mult  - sub;
-	var vth= gain * vin;
-	var err = Math.random()/30;
->>>>>>> f24e036955644db27a6cc92299a5401204987ab9
 	err -= err/2;
 	var vexp = vth + err;
 	err = ((vth - vexp)/vth) * 100;
 	err *= (err<0)?(-1):1;
 	err = Math.round(err*100)/100;
 	err = err + "%";
-<<<<<<< HEAD
 	cfreq = cfreq + " khz";
 	arr =  [Math.round(vin*100)/100, cfreq, Math.round(vth*10000)/10000, Math.round(vexp*10000)/10000, err];
 	} else {
 		tr.style.fontWeight = "bold";
 	}
 	for(var col = 0; col < 5; col++) {
-=======
-	arr =  [Math.round(vin*100)/100, Math.round(vth*100)/100, Math.round(vexp*100)/100, err];
-	} else {
-		tr.style.fontWeight = "bold";
-	}
-	for(var col = 0; col < 4; col++) {
->>>>>>> f24e036955644db27a6cc92299a5401204987ab9
 		var td = document.createElement("td");
 		td.innerHTML = arr[col];
 		tr.appendChild(td);
 	}
 	table.appendChild(tr);
 }
-<<<<<<< HEAD
 document.getElementsByTagName("div")[0].appendChild(table);
 table.border = 1;
 table.style.borderCollapse = "collapse";
@@ -97,14 +65,6 @@ document.querySelector('button').addEventListener('click', function(){
 	div.style.visibility = "hidden";
 	par.innerHTML = "Your tables have been copied to clipboard. Just paste in word or cick Cntrl V";
 });
-=======
-body.appendChild(table);
-table.border = 1;
-table.style.borderCollapse = "collapse";
-body.appendChild(document.createElement("br"));
-body.appendChild(document.createElement("hr"));
-}
->>>>>>> f24e036955644db27a6cc92299a5401204987ab9
 </script>
 </body>
 </html>
