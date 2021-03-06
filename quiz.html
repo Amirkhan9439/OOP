@@ -47,14 +47,20 @@ function Exec() {
 	else {
 	reg = arr[0];
 	var sum = arr[1], avg = sum / 4;
+	var av = reg % 100;
+	av = (Math.floor((av / 10)) + (av%10))/2;
+	var zz = Math.round(reg / 100);
+	zz = (Math.floor((zz / 10)) + (zz%10))/2;
 	let z = new Complex([50, sum, 0]);
-	str += "My reg is " + reg + " and the sum is " + sum;
-	str += "<br>  Z = " + z.getPrintableRect() + "<br> Z = " + z.getPrintablePolar();
-	str += "<br> power factor is cos(" + z.getPolar()[1] + ") = " + Math.cos(z.getPolar()[1] * Math.PI /180);
-	str += " " + ((z.getPolar()[1]<0)?"leading":"lagging")  + "<br>";
-	str += "Zc = " + z.getRect()[0] + "<sup>2</sup> + "  + z.getRect()[1] + "<sup>2</sup>"  + " &div; " + z.getRect()[0] + "tan(cos<sup>-1</sup>(1)) - " + z.getRect()[1];
-	var zc = (z.getRect()[0] *z.getRect()[0] + z.getRect()[1] *z.getRect()[1])/(z.getRect()[1]);
-	str+= "<br> Zc = " + zc + "j <br> we should connect a zc = " + zc + "j in parallel";
+	str += "My z is " + av + " p is" + zz;
+	str += "<br> Comparing nomiantor  <br>";
+	str += "L/2 = 1/" + zz;
+	str+= "<br> L = " + round(2/zz);
+	str += "<br> Comparing denominator <br>";
+	str += "L/10 + 1/" + av;
+	str += "<br>L = " + round(10/av);
+	if(round(2/zz) == round(2/zz)) str += "<br> This shows that the equation cannot be solved for my reg";
+	else str+= "Hence the value of L is " + round(10/av);
 	}
 	document.getElementsByTagName("p")[0].innerHTML = str;
 }
