@@ -5,7 +5,7 @@
 <script>
 var body = document.getElementsByTagName("body")[0];
 var par = document.createElement("p");
-par.innerHTML = "Click the button bellow";
+par.innerHTML = "Click the button Bellow. Your tables will get copied to clipboard.";
 par.style.fontSize = "30px";
 par.style.color = "#ff0000";
 body.appendChild(par);
@@ -21,28 +21,41 @@ var heading = document.createElement("h2");
 heading.innerHTML = "table " + tnumber;
 document.getElementsByTagName("div")[0].appendChild(heading);
 var table = document.createElement("table");
-for(var row = 0; row < 6; row++) {
-	var arr = ["V<sub>in</sub>", "Freqeuency", "V<sub>o th</sub>", "V<sub>o Exp</sub>", "error"];
-	var volts = [1, 2, 1, 2, 2.5], freqArr = [1, 1, 2, 1.5, 2.5];
+//var arr2 = [[2, 3, 4], [2, 3, 4]];
+var arr2 = [["", "Theoretical", "Practical"], ["Pass band gain (Af)","2","2"], ["Pass band gain in db","6.02059991328", "6"],["Low cutoff Frequency", "723.431559509", "722"], ["Gain at 3db FL","510.766", "510"]];
+var t1 = document.createElement("table");
+for(var r = 0; r < arr2.length;r++) {
+	var ttr = document.createElement("tr");
+	for(var c = 0; c < arr2[r].length;c++) {
+		var ttd = document.createElement("td");
+		ttd.innerHTML = arr2[r][c];
+		ttr.appendChild(ttd);
+	}
+	t1.appendChild(ttr);
+}
+div.appendChild(t1);
+t1.border = 1;
+t1.style.borderCollapse = "collapse";
+document.getElementsByTagName("div")[0].appendChild(document.createElement("br"));
+var values = [300, 500, 700, 1000, 5000, 10000, 15000];
+var fl = 723.431559509;
+for(var row = 0; row <= values.length; row++) {
+	var arr = ["Sr. No", "Input Frequency (Hz)", "V<sub>out</sub>", "|V<sub>out</sub>/V<sub>in</sub>| = Gain", "Gain in db = 20log|V<sub>out</sub>/V<sub>in</sub>|"];
 	var tr = document.createElement("tr");
 	tr.style.textAlign = "center";
 	if(row!=0) {
-	var vin = volts[row-1];
-	var cfreq = freqArr[row-1];
-	var vth= vin/(2*Math.PI*cfreq);
+	var cfreq = values[row-1];
+	var vout= 2/(Math.sqrt(1 + ((cfreq*cfreq)/(fl * fl))));
 	var err = Math.random()/100;
 	err -= err/2;
-	var vexp = vth + err;
-	err = ((vth - vexp)/vth) * 100;
-	err *= (err<0)?(-1):1;
-	err = Math.round(err*100)/100;
-	err = err + "%";
-	cfreq = cfreq + " khz";
-	arr =  [Math.round(vin*100)/100, cfreq, Math.round(vth*10000)/10000, Math.round(vexp*10000)/10000, err];
+	//vout += err;
+	var fr = (cfreq<1000)?cfreq + "":(cfreq/1000) + " Khz";
+	vout = Math.round(vout*10000)/10000;
+	arr =  [row, fr, vout, vout, 20*Math.log10(vout)];
 	} else {
 		tr.style.fontWeight = "bold";
 	}
-	for(var col = 0; col < 5; col++) {
+	for(var col = 0; col < arr.length; col++) {
 		var td = document.createElement("td");
 		td.innerHTML = arr[col];
 		tr.appendChild(td);
