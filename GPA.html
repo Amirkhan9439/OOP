@@ -59,6 +59,7 @@ cal.addEventListener("click", calculate);
 h.style.margin = "0 auto";
 h.style.border = "3px solid green";
 h.style.padding = "8px";
+window.addEventListener("resize", resized);
 function getSelectTag() {
 	var select = document.createElement("select");
 	var optgroup = document.createElement("optgroup");
@@ -145,6 +146,21 @@ function calculate() {
 function round(num) {
 	return ((Math.round(num*100))/100);
 }
+
+function resized() {
+	var style = window.getComputedStyle(ch1);
+	var first = toNumeric(style.getPropertyValue('width'));
+	style = window.getComputedStyle(ch2);
+	var wd = toNumeric(style.getPropertyValue('width'));
+parent1.style.width = (first + wd + 1) + "px";
+style = window.getComputedStyle(ch3);
+var wd1 = toNumeric(style.getPropertyValue('width'));
+parent.style.width = (first + wd + wd1 + 1) + "px";
+h.style.width = (first + wd + wd1 + 1) + "px";
+cal.style.width = (first + wd + wd1 + 1) + "px";
+resPar.innerHTML = wd1;
+}
+
 </script>
 </body>
 </html>
