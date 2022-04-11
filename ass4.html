@@ -1,0 +1,230 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<script>
+var currentlySelected = 0;
+var body = document.getElementsByTagName("body")[0];
+var cont = document.createElement("div"), navBar = document.createElement("div");
+var labels = ["Simple Interest", "Future Worth single Payment", "Present Worth Single Payment", "Uniform Series Compound Amount Factor", "Uniform Series Sinking Fund Factor", "Uniform Series Present Worth Factor", "Uniform Series Capital Recovery Factor", "Gradient touniform_series_conversion"];
+var SI = ["Principle Ammount", "Interest Rate", "Period"];
+var FWSP = ["Present Worth", "Interest Rate", "Period"];
+var SPPW = ["Future Worth", "Interest Rate", "Period"];
+var USCA = ["Annuity", "Interest Rate", "Period"];
+var USSA = SPPW;
+var USPW = USCA;
+var USCR = FWSP;
+var GS = ["G", "Interest Rate", "Period"];
+var individualContainers = [];
+cont.style.display = "flex";
+cont.style.flexDirection = "row";
+navBar.style.display = "flex";
+navBar.style.flexDirection = "column";
+for(var i = 0; i < labels.length; i++) {
+	var temp = document.createElement("div");
+	var sp = document.createElement("span");
+	sp.innerHTML = labels[i];
+	sp.style.fontSize = "20px";
+	sp.style.color = "#fff";
+	sp.style.fontWeight = "bold";
+	temp.appendChild(sp);
+	temp.style.border = "1px solid black";
+	temp.style.padding = "10px";
+	temp.style.backgroundColor = "#777";
+	temp.addEventListener("mouseover", function(e){
+		if(currentlySelected != labels.indexOf(this.firstChild.innerHTML))
+		this.style.backgroundColor = "#555";
+		this.style.cursor = "pointer";
+	});
+	temp.addEventListener("mouseout", function(e){
+		if(currentlySelected != labels.indexOf(this.firstChild.innerHTML))
+		this.style.backgroundColor = "#777";
+		this.style.cursor = "auto";
+	});
+	temp.addEventListener("click", function(e) {
+		var cspantext = this.firstElementChild.innerHTML;
+		var indx = labels.indexOf(cspantext);
+		changeColor(indx);
+		cont.removeChild(cont.childNodes[1]);
+		cont.appendChild(individualContainers[currentlySelected]);
+	});
+	navBar.appendChild(temp);
+	var contDiv = document.createElement("div");
+	contDiv.style.border = "2px solid black";
+	contDiv.style.display = "flex";
+	contDiv.style.flexDirection = "column";
+	attachLabeledInputDivs(contDiv, i);
+	individualContainers[i] = contDiv;
+}
+
+function changeColor(indx) {
+	navBar.childNodes[currentlySelected].style.backgroundColor = "#777";
+	currentlySelected = indx;
+	navBar.childNodes[currentlySelected].style.backgroundColor = "#ff7a00";
+}
+
+function attachLabeledInputDivs(parent, number) {
+	var currArray;
+	switch(number) {
+		case 0:
+		currArray = SI;
+		break;
+		case 1:
+		currArray = FWSP;
+		break;
+		case 2:
+		currArray = SPPW;
+		break;
+		case 3:
+		currArray = USCA;
+		break;
+		case 4:
+		currArray = SPPW;
+		break;
+		case 5:
+		currArray = USCA;
+		break;
+		case 6:
+		currArray = FWSP;
+		break;
+		case 7:
+		currArray = GS;
+		break;
+	}
+	for(var i = 0; i < currArray.length; i++) {
+		var tl = document.createElement("div");
+		tl.style.display = "flex";
+		tl.style.flexDirection = "row";
+		var lbdiv = document.createElement("div");
+		lbdiv.style.padding = "10px";
+		var lb = document.createElement("label");
+		lb.innerHTML = currArray[i];
+		lb.style.fontSize = "15px";
+		lb.style.fontWeight = "bold";
+		lbdiv.appendChild(lb);
+		var inpDiv = document.createElement("div");
+		inpDiv.style.padding = "10px";
+		var inp = document.createElement("input");
+		inp.setAttribute("type", "number");
+		inp.style.fontSize = "15px";
+		inpDiv.appendChild(inp);
+		tl.appendChild(lbdiv);
+		tl.appendChild(inpDiv);
+		parent.appendChild(tl);
+	}
+	var d = document.createElement("div");
+	var par = document.createElement("p");
+	par.style.fontWeight = "bold";
+	d.appendChild(par);
+	var btn = document.createElement("button");
+	var d1 = document.createElement("div");
+	btn.innerHTML = "Calculate";
+	btn.addEventListener("click", function(e) {
+	var inst = new EngEconomics();
+	var str;
+	switch(currentlySelected) {
+		case 0:
+			str = inst.simple_interest();
+		break;
+		case 1:
+			str = inst.future_worth_single_payment();
+		break;
+		case 2:
+			str = inst.present_worth_single_payment();
+		break;
+		case 3:
+			str = inst.uniform_series_compound_amount_factor();
+		break;
+		case 4:
+			str = inst.uniform_series_sinking_fund_factor();
+		break;
+		case 4:
+			str = inst.uniform_series_present_worth();
+		break;
+		case 5:
+			str = inst.uniform_series_capital_recovery_factor();
+		break;
+		case 6:
+			str = inst.gradient_series_present_worth_factor();
+		break;
+	}
+	document.getElementsByTagName("p")[0].innerHTML = str;
+	});
+	d1.appendChild(btn);
+	parent.appendChild(d);
+	parent.appendChild(d1);
+}
+
+cont.appendChild(navBar);
+cont.appendChild(individualContainers[currentlySelected]);
+changeColor(currentlySelected);
+body.appendChild(cont);
+
+class EngEconomics {
+	constructor() {
+		this.interestRate = document.getElementsByTagName("input")[1].value;
+		this.period = document.getElementsByTagName("input")[2].value;
+	}
+	simple_interest() {
+		var str = "Simple Interest = ";
+		var principleAmount = document.getElementsByTagName("input")[0].value;
+		var SI = principleAmount * (1 + (this.interestRate/100) * this.period);
+		str += SI + "";
+		return str;
+	}
+	future_worth_single_payment() {
+		var PW = document.getElementsByTagName("input")[0].value;
+		var str = "The worth of " + PW + " period " + this.period + " will be ";
+		str += PW * Math.pow((1+this.interestRate/100), this.period) + "";
+		return str;
+	}
+	
+	present_worth_single_payment() {
+		var FW = document.getElementsByTagName("input")[0].value;
+		var str = "The present worth of what would be " + FW + " after " + this.period + " periods is ";
+		str += FW * Math.pow((1+this.interestRate/100), this.period* (-1)) + "";
+		return str;
+	}
+	
+	uniform_series_compound_amount_factor() {
+		var annuity = document.getElementsByTagName("input")[0].value;
+		var str = "Future Worth = ";
+		str += annuity * (Math.pow((1+this.interestRate/100), this.period* (-1)) - 1)/(this.interestRate/100) + "";
+		return str;
+	}
+	
+	uniform_series_sinking_fund_factor() {
+		var FW = document.getElementsByTagName("input")[0].value;
+		var str = "Annuity = ";
+		str += FW * ((this.interestRate/100)/(Math.pow((1+this.interestRate/100), this.period) -1)) + "";
+		return str;
+	}
+	
+	uniform_series_present_worth() {
+		var annuity = document.getElementsByTagName("input")[0].value;
+		var exp = Math.pow((1+this.interestRate/100), this.period* (1));
+		var str = "PW = ";
+		str += annuity * ((exp-1)/((this.interestRate/100)*exp)) + "";
+		return str;
+	}
+	
+	uniform_series_capital_recovery_factor() {
+		var PW = document.getElementsByTagName("input")[0].value;
+		var exp = Math.pow((1+this.interestRate/100), this.period* (1));
+		var str = "Annuity = ";
+		str += PW * ((exp * this.interestRate/100)/(exp - 1)) + "";
+		return str;
+	}
+	
+	gradient_series_present_worth_factor() {
+		var G = document.getElementsByTagName("input")[0].value;
+		var exp = Math.pow((1+this.interestRate/100), this.period* (1));
+		var str = "Annuity = ";
+		str += G * (exp * this.interestRate * this.period - 1)/(exp * this.interestRate*this.InterestRate) + "";
+		return str;
+	}
+}	
+</script>
+</body>
+</html>
