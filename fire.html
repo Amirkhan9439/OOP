@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> <!-- Add Firestore library -->
+  
+</head>
+<body>
+  <p></p>
+  <script>
+   const firebaseConfig = {
+  apiKey: "AIzaSyBa9UCDK9MZCrL9421K2-fyzDdN5yF6dmE",
+  authDomain: "webnotificationsample-74039.firebaseapp.com",
+  projectId: "webnotificationsample-74039",
+  storageBucket: "webnotificationsample-74039.appspot.com",
+  messagingSenderId: "322367760621",
+  appId: "1:322367760621:web:eecdb8dbfaaeaeb122c4e4",
+  measurementId: "G-29N392DR0G"
+};
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+    const db = firebase.firestore(); // Initialize Firestore
+
+   // sendTokenToServer("abc");
+    // Request permission for notifications
+    messaging.requestPermission()
+      .then(() => {
+        console.log('Notification permission granted.');
+        // Get FCM token
+        var res = messaging.getToken();
+        console.log("token + " + res);
+        return res;
+      })
+      .then((token) => {
+        console.log('FCM token:', token);
+        // Upload the token to Firestore
+        return sendTokenToServer(token);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+      
+    function sendTokenToServer(token) {
+      const tokenCollection = db.collection('token');
+      const usersDoc = tokenCollection.doc('users');
+      const dataToUpdate = {};
+      dataToUpdate[token] = { name: "aamir", token: token };
+
+      return usersDoc.get()
+        .then((doc) => {
+          if (doc.exists) {
+            return usersDoc.update(dataToUpdate);
+          } else {
+            return usersDoc.set(dataToUpdate);
+          }
+        })
+        .then(() => {
+          console.log('Token added to Firestore');
+        })
+        .catch((error) => {
+          console.error('Error adding/updating document:', error);
+        });
+    }
+  </script>
+  <script>
+    // Register the service worker for Firebase Messaging
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered:', registration);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+  </script>
+</body>
+</html>
