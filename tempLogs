@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Export Table to Excel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      margin: 10;
+    }
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      text-align: left;
+      padding: 8px;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer; /* Indicates the header is clickable */
+  position: relative; /* Needed to position the sorting arrow */
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .sort-arrow {
+  display: inline-block;
+  width: 0; 
+  height: 0; 
+  margin-left: 5px;
+  vertical-align: middle;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  /* Arrow is initially hidden */
+}
+    .sort-arrow.asc {
+  border-bottom: 4px solid black; /* Ascending arrow */
+}
+
+.sort-arrow.desc {
+  border-top: 4px solid black; /* Descending arrow */
+}
+    .export-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 20px px;
+    }
+    .export-btn:hover {
+      background-color: #45a049;
+    }
+    .fa-download {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<button class="export-btn" onclick="exportTableToExcel()"><i class="fas fa-download"></i>Export to Excel</button>
+<table>
+  <tr>
+    <th>No.</th>
+    <th>Practice Name</th>
+    <th>PC(s) Count</th>
+    <th>PC(s)</th>
+    <th>Tab(s) Count</th>
+    <th>Tab(s)</th>
+    <th>Emails</th>
+    <th>Treatment Plans</th>
+  </tr>
+  <!-- Table data will be inserted here from the script -->
+</table>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script>
+    var table = document.getElementsByTagName("table")[0];
+    const firebaseConfig = {
+    apiKey: "AIzaSyCiwvorsG11pL3qpbVBQtBjslCP-sm2UMM",
+    authDomain: "conjoincatalyst-145e8.firebaseapp.com",
+    databaseURL: "https://conjoincatalyst-145e8-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "conjoincatalyst-145e8",
+    storageBucket: "conjoincatalyst-145e8.appspot.com",
+    messagingSenderId: "1041129557772",
+    appId: "1:1041129557772:web:626968c09956d062c48329",
+    measurementId: "G-1VPF7CVC0L"
+  };
+    var practiceMaps = {};
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+    const db = firebase.firestore(); // Initialize Firestore
+    db.collection("versions").doc("practices").get().then((doc) => {
+    if (doc.exists) {
+      practiceMaps = doc.data()
+      
+    } else {
+      console.log("No such document!");
+    }
+  }).catch((error) => {
+    console.log("Error getting document:", error);
+  });
+
+  var tokensSnap = {};
+  db.collection("tokens").get().then((snap) => {
+    snap.forEach((doc) => {
+      if(practiceMaps[doc.id+""]) {
+        var tokenData = doc.data();
+        tabNames = [];
+        Object.values(tokenData).forEach((value) => {tabNames.push(value["tabName"])});
+        tokensSnap[doc.id+""] = tabNames;
+      }
+    });
+  });
+  db.collection("plugins").get().then((pluginsSnapshot) => {
+    var srno = 1;
+    pluginsSnapshot.forEach((doc) => {
+      if(practiceMaps[doc.id+""]) {
+        var tr = document.createElement("tr");
+        var srTd = document.createElement("td");
+        srTd.innerHTML = srno++;
+        tr.appendChild(srTd);
+        var practiceName = practiceMaps[doc.id+""];
+        var deviceNames = [];
+        var indPracticeData = doc.data();
+        Object.values(indPracticeData).forEach((value) => {deviceNames.push(value["deviceName"])});
+        var tabNames = [];
+        if(tokensSnap[doc.id+""]) tabNames = tokensSnap[doc.id+""];
+        var pracNametd = document.createElement("td");
+        pracNametd.innerHTML = practiceName;
+        tr.appendChild(pracNametd);
+        var numDevtd = document.createElement("td");
+        numDevtd.innerHTML = deviceNames.length;
+        tr.appendChild(numDevtd);
+        var devicestd = document.createElement("td");
+        devicestd.innerHTML = deviceNames.join("<br>");
+        tr.appendChild(devicestd);
+        var numTabtd = document.createElement("td");
+        numTabtd.innerHTML = tabNames.length;
+        tr.appendChild(numTabtd);
+        var tabstd = document.createElement("td");
+        tabstd.innerHTML = tabNames.join("<br>");
+        tr.appendChild(tabstd);
+
+        var plantd = document.createElement("td");
+        plantd.innerHTML = "0";
+        tr.appendChild(plantd);
+        var emailtd = document.createElement("td");
+        emailtd.innerHTML = "0";
+        tr.appendChild(emailtd);
+        table.appendChild(tr);
+
+      }
+    });
+  });
+  function exportTableToExcel() {
+  var downloadLink;
+  var dataType = 'application/vnd.ms-excel';
+  var tableSelect = document.getElementsByTagName("table")[0];
+  var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+  
+  // Specify file name
+  filename = "conjoin_installation_logs.xls";
+  
+  // Create download link element
+  downloadLink = document.createElement("a");
+  
+  document.body.appendChild(downloadLink);
+  
+  if(navigator.msSaveOrOpenBlob){
+      var blob = new Blob(['\ufeff', tableHTML], {
+          type: dataType
+      });
+      navigator.msSaveOrOpenBlob( blob, filename);
+  }else{
+      // Create a link to the file
+      downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+  
+      // Setting the file name
+      downloadLink.download = filename;
+      
+      //triggering the function
+      downloadLink.click();
+  }
+}
+document.addEventListener("DOMContentLoaded", function() {
+  const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+  const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+      v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+      )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+  // Function to clear existing arrows
+  const clearArrows = () => {
+    document.querySelectorAll('.sort-arrow').forEach(arrow => {
+      arrow.classList.remove('asc', 'desc');
+    });
+  };
+
+  // Attach a listener to all headers
+  document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+      const table = th.closest('table');
+      const tbody = table.querySelector('tbody');
+      Array.from(tbody.querySelectorAll('tr'))
+          .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+          .forEach(tr => tbody.appendChild(tr) );
+      clearArrows(); // Clear arrows from all headers
+      th.querySelector('.sort-arrow').classList.add(this.asc ? 'asc' : 'desc');
+  })));
+
+  // Add sort arrows to each header cell
+  document.querySelectorAll('th').forEach(th => {
+    const arrow = document.createElement('span');
+    arrow.className = 'sort-arrow';
+    th.appendChild(arrow);
+  });
+});
+
+	</script>
+	</body>
+	</html>
